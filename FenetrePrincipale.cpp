@@ -66,19 +66,23 @@ void FenetrePrincipale::creerActions()
 	
 	/* Actions du menu infos (?) */
 	actionAbout=menuInfos->addAction(tr("A propos..."));
-	actionAboutQt=menuInfos->addAction(tr("A propos de Qt..."));
+    actionAboutQt=menuInfos->addAction(tr("A propos de Qt..."));
 
 }
 
 
 /** Private slots */
 
-
 void FenetrePrincipale::ouvrirFichier()
 {
+    std::string REP_HOME= getenv("HOME");
+	if (getenv("HOME") != NULL)
+	{
+		const QString rep_fichiers=getenv("HOME");
+	}
+	else throw std::bad_alloc();
 	// Creation du fichier avec le nom choisi dans fenetre_save
-	//QString nom_fichier = QFileDialog::getSaveFileName(this, tr("Save File"),"/home/milletj",tr("Header (*.h)"));
-	
+    QString nom_fichier = QFileDialog::getOpenFileName(this, tr("Ouvrir"),"/home/milletj",tr("hdf (*.hdf,*.hdf5)"));
 	
 }
 
@@ -97,11 +101,6 @@ void  FenetrePrincipale::afficher_infos_qt()
 {
     QMessageBox::aboutQt(this);
 }
-
-
-
-
-
 
 
 

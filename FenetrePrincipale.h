@@ -11,6 +11,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+
 /**
  * @brief The FenetrePrincipale class
  */
@@ -31,8 +32,7 @@ class FenetrePrincipale : public QMainWindow
 		QAction* actionAbout;
 		QAction* actionAboutQt;
 		QAction* actionExporter;
-		
-		
+				
 		QProgressBar* chargementDonnees;
 
 	public:

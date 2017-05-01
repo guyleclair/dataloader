@@ -16,3 +16,5 @@ SOURCES += main.cpp\
         FenetrePrincipale.cpp
 
 HEADERS  += FenetrePrincipale.h
+
+CONFIG += c++11
