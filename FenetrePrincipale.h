@@ -28,6 +28,8 @@ class FenetrePrincipale : public QMainWindow
 		QAction* actionAnnuler;
 		QAction* actionAbout;
 		QAction* actionAboutQt;
+		QAction* actionExporter;
+		
 		
 		QProgressBar* chargementDonnees;
 
@@ -37,6 +39,9 @@ class FenetrePrincipale : public QMainWindow
 		void creerActions();
 		void creerBarresOutils();
 		~FenetrePrincipale();
+		
+	private slots:
+		void ouvrirFichier();
 		
 };
 
