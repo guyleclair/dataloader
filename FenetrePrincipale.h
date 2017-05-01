@@ -7,7 +7,9 @@
 #include <QStyle>
 #include <QApplication>
 #include <QToolBar>
-
+#include <QStatusBar>
+#include <QFileDialog>
+#include <QMessageBox>
 
 /**
  * @brief The FenetrePrincipale class
@@ -42,6 +44,10 @@ class FenetrePrincipale : public QMainWindow
 		
 	private slots:
 		void ouvrirFichier();
+		
+	public slots:
+		void afficher_infos();
+		void afficher_infos_qt();
 		
 };
 
