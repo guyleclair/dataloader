@@ -1,6 +1,9 @@
 #include "FenetrePrincipale.h"
 
 
+/**
+ * @brief FenetrePrincipale::FenetrePrincipale Constructeur par defaut
+ */
 FenetrePrincipale::FenetrePrincipale()
 {
 	/** Creation des menus, barre d'outils */
@@ -23,10 +26,9 @@ FenetrePrincipale::FenetrePrincipale()
 	statusBar()->addPermanentWidget(chargementDonnees);
 	
 	
-	QWidget *zoneCentrale = new QWidget(this);
+	zoneCentrale = new QLabel(this);
     setCentralWidget(zoneCentrale);
-
-    
+	
 }
 
 
@@ -71,26 +73,105 @@ void FenetrePrincipale::creerActions()
 }
 
 
-/** Private slots */
+/**
+ * @brief FenetrePrincipale::afficher_fichier affiche un fichier hdf5
+ * dans la fenetre
+ * @param nom_fichier
+ */
+void FenetrePrincipale::afficher_fichier(const H5std_string & nom_fichier)
+{
+	try
+	{
+		// Nom du dataset a extraire
+		const H5std_string DATASET_NAME( "CMa" );
+		
+		// Ouverture du fichier et du dataset
+		H5::H5File fichier(nom_fichier, H5F_ACC_RDONLY );
+		H5::DataSet dataset = fichier.openDataSet( DATASET_NAME );
+		
+		// Recuperation de la palette
+		if (dataset.attrExists("PALETTE"))
+			std::cout<< "L'attribut palette existe"<< std::endl;
+		
+		// Get dataspace of the dataset.
+		H5::DataSpace dataspace = dataset.getSpace();
+		int rank = dataspace.getSimpleExtentNdims(); // nb de dimensions (2)
+		
+		// Recuperation de nx et ny :
+		hsize_t dims_out[2];
+		int ndims = dataspace.getSimpleExtentDims( dims_out, NULL);
+		std::cout << "rank " << rank << ", dimensions " <<
+			(unsigned long)(dims_out[0]) << " x " <<
+			(unsigned long)(dims_out[1]) << std::endl;
+		const int NX= (unsigned long)(dims_out[0]);
+		const int NY= (unsigned long)(dims_out[1]);
+		
+		// Recuperation des donnees
+		std::vector<unsigned char> donnees;
+		donnees.resize(NX*NY);
+		
+		// important: donnees[i* 3712 + j]= data[i][j]
+		std::cout<< "Lecture des donnees"<< std::endl;
+		dataset.read(&donnees[0], H5::PredType::NATIVE_UCHAR);
 
+		//QImage image("/home/milletj/Documents/test.jpg");
+		QImage image;
+		//image.setColorTable();
+		image.loadFromData(reinterpret_cast<const unsigned char*>(donnees.data()),QImage::Format_Indexed8);
+		zoneCentrale->setBackgroundRole(QPalette::Base);
+		zoneCentrale->setPixmap(QPixmap::fromImage(image));
+		zoneCentrale->show();
+
+		
+	}
+	
+	// catch failure caused by the H5File operations
+	catch( H5::FileIException error )
+	{
+		error.printError();
+		return;
+	}
+	// catch failure caused by the DataSet operations
+	catch( H5::DataSetIException error )
+	{
+		error.printError();
+		return;
+	}
+	// catch failure caused by the DataSpace operations
+	catch( H5::DataSpaceIException error )
+	{
+		error.printError();
+		return;
+	}
+	// catch failure caused by the DataSpace operations
+	catch( H5::DataTypeIException error )
+	{
+		error.printError();
+		return;
+	}
+	
+}
+
+
+/** Private slots */
 void FenetrePrincipale::ouvrirFichier()
 {
     std::string REP_HOME= getenv("HOME");
-	if (getenv("HOME") != NULL)
+	if (getenv("HOME") != nullptr)
 	{
 		const QString rep_fichiers=getenv("HOME");
 	}
 	else throw std::bad_alloc();
 	// Creation du fichier avec le nom choisi dans fenetre_save
-    QString nom_fichier = QFileDialog::getOpenFileName(this, tr("Ouvrir"),"/home/milletj",tr("hdf (*.hdf,*.hdf5)"));
-	
+	QString nom_fichier = QFileDialog::getOpenFileName(this, tr("Ouvrir"),"/home/milletj/Documents/Radar","hdf5 (*.hdf *.hdf5)");
+	if (nom_fichier == nullptr)
+		return;
+	const H5std_string nom_fichier_hdf5(nom_fichier.toStdString());
+	afficher_fichier(nom_fichier_hdf5);
 }
 
 
-
-
 /** Public slots */
-
 void  FenetrePrincipale::afficher_infos()
 {
     QMessageBox::about(this,"A propos de ce logiciel", "<b> dataloader </b> \n Version 1.0 \n");
@@ -103,10 +184,7 @@ void  FenetrePrincipale::afficher_infos_qt()
 }
 
 
-
-
 FenetrePrincipale::~FenetrePrincipale()
 {
     
 }
-

@@ -10,6 +10,11 @@
 #include <QStatusBar>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QGraphicsScene>
+#include <QLabel>
+
+#include <iostream>
+#include "H5Cpp.h"
 
 
 /**
@@ -20,6 +25,11 @@ class FenetrePrincipale : public QMainWindow
 	Q_OBJECT
 
 	private:
+		
+		QLabel* zoneCentrale;
+		QGraphicsScene* sceneImage;
+		QGraphicsView * viewImage;	// fenetre d'affichage des fichiers
+		
 		QMenu* menuFichier;
         QMenu* menuInfos;
         QToolBar* toolBar;
@@ -32,7 +42,7 @@ class FenetrePrincipale : public QMainWindow
 		QAction* actionAbout;
 		QAction* actionAboutQt;
 		QAction* actionExporter;
-				
+
 		QProgressBar* chargementDonnees;
 
 	public:
@@ -40,6 +50,7 @@ class FenetrePrincipale : public QMainWindow
 		void creerMenus();
 		void creerActions();
 		void creerBarresOutils();
+		void afficher_fichier(const H5std_string & nom_fichier);
 		~FenetrePrincipale();
 		
 	private slots:
