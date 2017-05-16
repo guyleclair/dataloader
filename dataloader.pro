@@ -13,9 +13,11 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        FenetrePrincipale.cpp
+        FenetrePrincipale.cpp \
+    h5utils.cpp
 
 HEADERS  += FenetrePrincipale.h\
+    h5utils.h
 
 CONFIG += c++11
 

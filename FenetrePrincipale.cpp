@@ -82,47 +82,26 @@ void FenetrePrincipale::afficher_fichier(const H5std_string & nom_fichier)
 {
 	try
 	{
-		// Nom du dataset a extraire
-		const H5std_string DATASET_NAME( "CMa" );
-		
-		// Ouverture du fichier et du dataset
-		H5::H5File fichier(nom_fichier, H5F_ACC_RDONLY );
-		H5::DataSet dataset = fichier.openDataSet( DATASET_NAME );
-		
-		// Recuperation de la palette
-		if (dataset.attrExists("PALETTE"))
-			std::cout<< "L'attribut palette existe"<< std::endl;
-		
-		// Get dataspace of the dataset.
-		H5::DataSpace dataspace = dataset.getSpace();
-		int rank = dataspace.getSimpleExtentNdims(); // nb de dimensions (2)
-		
-		// Recuperation de nx et ny :
-		hsize_t dims_out[2];
-		int ndims = dataspace.getSimpleExtentDims( dims_out, NULL);
-		std::cout << "rank " << rank << ", dimensions " <<
-			(unsigned long)(dims_out[0]) << " x " <<
-			(unsigned long)(dims_out[1]) << std::endl;
-		const int NX= (unsigned long)(dims_out[0]);
-		const int NY= (unsigned long)(dims_out[1]);
-		
-		// Recuperation des donnees
-		std::vector<unsigned char> donnees;
-		donnees.resize(NX*NY);
-		
-		// important: donnees[i* 3712 + j]= data[i][j]
-		std::cout<< "Lecture des donnees"<< std::endl;
-		dataset.read(&donnees[0], H5::PredType::NATIVE_UCHAR);
 
-		//QImage image("/home/milletj/Documents/test.jpg");
-		QImage image;
-		//image.setColorTable();
-		image.loadFromData(reinterpret_cast<const unsigned char*>(donnees.data()),QImage::Format_Indexed8);
-		zoneCentrale->setBackgroundRole(QPalette::Base);
+		// Ouverture du fichier
+		H5::H5File fichier(nom_fichier, H5F_ACC_RDONLY );
+		std::vector<unsigned char> donnees=get_donnees_CM(fichier);
+		std::cout<< "Fin de recuperation  donnnees"<< std::endl;
+		std::vector<std::vector<int>>  palette_CM = get_palette_CM(fichier);
+
+		QVector<QRgb> table;
+		for (unsigned short int i=0;i<palette_CM.size();i++)
+		{
+			std::cout<< palette_CM[i][0]<< ' '<< palette_CM[i][1]<< ' '<<palette_CM[i][2] << std::endl;
+			table.push_back(qRgb(palette_CM[i][0],palette_CM[i][1],palette_CM[i][2]));
+		}
+				
+		QImage image(&donnees[0],3712,3712,QImage::Format_Indexed8);
+		image.setColorTable(table);
+
+		//zoneCentrale->setBackgroundRole(QPalette::Base);
 		zoneCentrale->setPixmap(QPixmap::fromImage(image));
 		zoneCentrale->show();
-
-		
 	}
 	
 	// catch failure caused by the H5File operations
@@ -156,14 +135,14 @@ void FenetrePrincipale::afficher_fichier(const H5std_string & nom_fichier)
 /** Private slots */
 void FenetrePrincipale::ouvrirFichier()
 {
-    std::string REP_HOME= getenv("HOME");
+	std::string REP_HOME= getenv("HOME");
 	if (getenv("HOME") != nullptr)
 	{
 		const QString rep_fichiers=getenv("HOME");
 	}
 	else throw std::bad_alloc();
 	// Creation du fichier avec le nom choisi dans fenetre_save
-	QString nom_fichier = QFileDialog::getOpenFileName(this, tr("Ouvrir"),"/home/milletj/Documents/Radar","hdf5 (*.hdf *.hdf5)");
+	QString nom_fichier = QFileDialog::getOpenFileName(this, tr("Ouvrir"),"/home/milletj/Documents/Radar","hdf5 (*.hdf *.hdf5 *.h5)");
 	if (nom_fichier == nullptr)
 		return;
 	const H5std_string nom_fichier_hdf5(nom_fichier.toStdString());

@@ -14,7 +14,8 @@
 #include <QLabel>
 
 #include <iostream>
-#include "H5Cpp.h"
+#include "h5utils.h"
+
 
 
 /**
@@ -53,10 +54,8 @@ class FenetrePrincipale : public QMainWindow
 		void afficher_fichier(const H5std_string & nom_fichier);
 		~FenetrePrincipale();
 		
-	private slots:
-		void ouvrirFichier();
-		
 	public slots:
+		void ouvrirFichier();
 		void afficher_infos();
 		void afficher_infos_qt();
 		
