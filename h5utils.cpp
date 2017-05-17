@@ -1,5 +1,23 @@
 #include "h5utils.h"
 
+const std::pair<int,int> get_nx_ny(const H5::H5File & fichier)
+{
+	// Nom du dataset a extraire
+	const H5std_string DATASET_NAME( "CMa" );
+	H5::DataSet dataset = fichier.openDataSet( DATASET_NAME );
+	
+	// Get dataspace of the dataset.
+	H5::DataSpace dataspace = dataset.getSpace();
+
+	// Recuperation de nx et ny :
+	hsize_t dims_out[2];
+	int ndims = dataspace.getSimpleExtentDims( dims_out, NULL);
+	const int nx= (unsigned long)(dims_out[0]);
+	const int ny= (unsigned long)(dims_out[1]);
+	std::pair<int,int> p2(nx,ny);
+	return p2;
+}
+
 
 
 /**

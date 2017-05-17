@@ -12,6 +12,8 @@
 #include <QMessageBox>
 #include <QGraphicsScene>
 #include <QLabel>
+#include <QTextEdit>
+#include <QLayout>
 
 #include <iostream>
 #include "h5utils.h"
@@ -27,7 +29,9 @@ class FenetrePrincipale : public QMainWindow
 
 	private:
 		
-		QLabel* zoneCentrale;
+		QWidget* zoneCentrale;
+		QLabel* imageCentrale;
+		QTextEdit* infosFichier;
 		QGraphicsScene* sceneImage;
 		QGraphicsView * viewImage;	// fenetre d'affichage des fichiers
 		

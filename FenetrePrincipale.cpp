@@ -24,10 +24,19 @@ FenetrePrincipale::FenetrePrincipale()
 	
 	chargementDonnees=new QProgressBar;
 	statusBar()->addPermanentWidget(chargementDonnees);
+
+	zoneCentrale=new QWidget(this);
+	imageCentrale = new QLabel(this);
+	infosFichier=new QTextEdit(tr("Metadonnées de l'image:"),this);
+
 	
-	
-	zoneCentrale = new QLabel(this);
+	QVBoxLayout *layout = new QVBoxLayout;
+    layout->addWidget(imageCentrale);
+	layout->addWidget(infosFichier);
+	zoneCentrale->setLayout(layout);
     setCentralWidget(zoneCentrale);
+	
+
 	
 }
 
@@ -95,15 +104,16 @@ void FenetrePrincipale::afficher_fichier(const H5std_string & nom_fichier)
 			std::cout<< palette_CM[i][0]<< ' '<< palette_CM[i][1]<< ' '<<palette_CM[i][2] << std::endl;
 			table.push_back(qRgb(palette_CM[i][0],palette_CM[i][1],palette_CM[i][2]));
 		}
-				
-		QImage image(&donnees[0],3712,3712,QImage::Format_Indexed8);
+
+		std::pair<int,int> dims=get_nx_ny(fichier);
+		QImage image(&donnees[0],dims.first,dims.second,QImage::Format_Indexed8);
 		image.setColorTable(table);
 
 		//zoneCentrale->setBackgroundRole(QPalette::Base);
-		zoneCentrale->setPixmap(QPixmap::fromImage(image));
-		zoneCentrale->show();
+		imageCentrale->setPixmap(QPixmap::fromImage(image.scaled(QSize(512,512))));
+		//zoneCentrale->show();
 	}
-	
+
 	// catch failure caused by the H5File operations
 	catch( H5::FileIException error )
 	{
@@ -136,13 +146,14 @@ void FenetrePrincipale::afficher_fichier(const H5std_string & nom_fichier)
 void FenetrePrincipale::ouvrirFichier()
 {
 	std::string REP_HOME= getenv("HOME");
+	QString rep_fichiers;
 	if (getenv("HOME") != nullptr)
 	{
-		const QString rep_fichiers=getenv("HOME");
+		rep_fichiers=getenv("HOME");
 	}
 	else throw std::bad_alloc();
 	// Creation du fichier avec le nom choisi dans fenetre_save
-	QString nom_fichier = QFileDialog::getOpenFileName(this, tr("Ouvrir"),"/home/milletj/Documents/Radar","hdf5 (*.hdf *.hdf5 *.h5)");
+	QString nom_fichier = QFileDialog::getOpenFileName(this, tr("Ouvrir"),rep_fichiers,"hdf5 (*.hdf *.hdf5 *.h5)");
 	if (nom_fichier == nullptr)
 		return;
 	const H5std_string nom_fichier_hdf5(nom_fichier.toStdString());
