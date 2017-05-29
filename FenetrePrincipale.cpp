@@ -13,31 +13,22 @@ FenetrePrincipale::FenetrePrincipale()
 
 	/** Connections */
 	connect(actionQuitter, SIGNAL(triggered()), qApp, SLOT(quit()));
-	
-	// connection pour nouveau fichier
-    connect( actionOuvrir,SIGNAL(triggered()),this,SLOT(ouvrirFichier()) );
-
+	// connections pour menus ouvrir, exporter
+	connect( actionOuvrir,SIGNAL(triggered()),this,SLOT(ouvrirFichier()) );
+	connect( actionExporter,SIGNAL(triggered()),this,SLOT(exporterHdf5Json()) );
 
 	// connections pour les actions d'infos
 	connect( actionAbout,SIGNAL(triggered()),this,SLOT(afficher_infos()) );
 	connect( actionAboutQt,SIGNAL(triggered()),this,SLOT(afficher_infos_qt()) );
-	
+
 	chargementDonnees=new QProgressBar;
 	statusBar()->addPermanentWidget(chargementDonnees);
 
+	// Affichage du widget central
 	zoneCentrale=new QWidget(this);
-	imageCentrale = new QLabel(this);
-	infosFichier=new QTextEdit(tr("Metadonnées de l'image:"),this);
-
-	
-	QVBoxLayout *layout = new QVBoxLayout;
-    layout->addWidget(imageCentrale);
-	layout->addWidget(infosFichier);
-	zoneCentrale->setLayout(layout);
     setCentralWidget(zoneCentrale);
-	
 
-	
+
 }
 
 
@@ -65,6 +56,7 @@ void FenetrePrincipale::creerActions()
     actionOuvrir=menuFichier->addAction("&Ouvrir");
 	// ajout dans la barre d'outils
 	QIcon iconeOuvrir = style->standardIcon(QStyle::SP_DirOpenIcon);
+	actionOuvrir->setShortcut(QKeySequence("Ctrl+O"));
 	actionOuvrir->setIcon(iconeOuvrir);
     toolBar->addAction(actionOuvrir);
 
@@ -73,7 +65,7 @@ void FenetrePrincipale::creerActions()
 	
 	// Quitter
 	actionQuitter=menuFichier->addAction("&Quitter");
-    actionQuitter->setShortcut(QKeySequence("Ctrl+Q"));
+	actionQuitter->setShortcut(QKeySequence("Ctrl+Q"));
 	
 	/* Actions du menu infos (?) */
 	actionAbout=menuInfos->addAction(tr("A propos..."));
@@ -110,8 +102,18 @@ void FenetrePrincipale::afficher_fichier(const H5std_string & nom_fichier)
 		image.setColorTable(table);
 
 		//zoneCentrale->setBackgroundRole(QPalette::Base);
+		
+		QLabel* imageCentrale = new QLabel(this);
 		imageCentrale->setPixmap(QPixmap::fromImage(image.scaled(QSize(512,512))));
-		//zoneCentrale->show();
+		QTextEdit* infosFichier=new QTextEdit(tr("Metadonnées de l'image:"),this);
+	
+		
+		QVBoxLayout *layout = new QVBoxLayout;
+	    layout->addWidget(imageCentrale);
+		layout->addWidget(infosFichier);
+		zoneCentrale->setLayout(layout);
+		zoneCentrale->show();
+		
 	}
 
 	// catch failure caused by the H5File operations
@@ -142,7 +144,7 @@ void FenetrePrincipale::afficher_fichier(const H5std_string & nom_fichier)
 }
 
 
-/** Private slots */
+/** Public slots */
 void FenetrePrincipale::ouvrirFichier()
 {
 	std::string REP_HOME= getenv("HOME");
@@ -161,7 +163,42 @@ void FenetrePrincipale::ouvrirFichier()
 }
 
 
-/** Public slots */
+void FenetrePrincipale::exporterHdf5Json()
+{
+	std::string REP_HOME= getenv("HOME");
+	QString rep_fichiers;
+	if (getenv("HOME") != nullptr)
+	{
+		rep_fichiers=getenv("HOME");
+	}
+	else throw std::bad_alloc();
+	// Creation du fichier avec le nom choisi dans fenetre_save
+	QString nom_fichier = QFileDialog::getOpenFileName(this, tr("Ouvrir"),rep_fichiers,"hdf5 (*.hdf *.hdf5 *.h5)");
+	if (nom_fichier == nullptr)
+		return;
+	const H5std_string nom_fichier_hdf5(nom_fichier.toStdString());
+	hdf2Json(nom_fichier_hdf5);
+}
+
+
+void FenetrePrincipale::hdf2Json(const H5std_string & nom_fichier_hdf5)
+{
+	// Ouverture du fichier
+	H5::H5File fichier(nom_fichier_hdf5, H5F_ACC_RDONLY );
+	std::vector<Point3D> matrice_lue= get_donnees_3D(fichier);
+	// export des donnees en Json
+	
+	
+}
+
+
+
+
+
+
+
+
+
 void  FenetrePrincipale::afficher_infos()
 {
     QMessageBox::about(this,"A propos de ce logiciel", "<b> dataloader </b> \n Version 1.0 \n");

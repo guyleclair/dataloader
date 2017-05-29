@@ -15,9 +15,10 @@
 #include <QTextEdit>
 #include <QLayout>
 
+
+
 #include <iostream>
 #include "h5utils.h"
-
 
 
 /**
@@ -30,8 +31,6 @@ class FenetrePrincipale : public QMainWindow
 	private:
 		
 		QWidget* zoneCentrale;
-		QLabel* imageCentrale;
-		QTextEdit* infosFichier;
 		QGraphicsScene* sceneImage;
 		QGraphicsView * viewImage;	// fenetre d'affichage des fichiers
 		
@@ -56,10 +55,12 @@ class FenetrePrincipale : public QMainWindow
 		void creerActions();
 		void creerBarresOutils();
 		void afficher_fichier(const H5std_string & nom_fichier);
+		void hdf2Json(const H5std_string & nom_fichier_hdf5);
 		~FenetrePrincipale();
 		
 	public slots:
 		void ouvrirFichier();
+		void exporterHdf5Json();
 		void afficher_infos();
 		void afficher_infos_qt();
 		
