@@ -2,7 +2,7 @@
 #define FENETREPRINCIPALE_H
 
 #include <QMainWindow>
-#include  <QProgressBar>
+#include <QProgressBar>
 #include <QMenuBar>
 #include <QStyle>
 #include <QApplication>
@@ -14,8 +14,9 @@
 #include <QLabel>
 #include <QTextEdit>
 #include <QLayout>
-
-
+#include <QJsonObject>
+#include <QJsonArray>
+#include  <QJsonDocument>
 
 #include <iostream>
 #include "h5utils.h"

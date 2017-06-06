@@ -28,7 +28,6 @@ FenetrePrincipale::FenetrePrincipale()
 	zoneCentrale=new QWidget(this);
     setCentralWidget(zoneCentrale);
 
-
 }
 
 
@@ -186,17 +185,41 @@ void FenetrePrincipale::hdf2Json(const H5std_string & nom_fichier_hdf5)
 	// Ouverture du fichier
 	H5::H5File fichier(nom_fichier_hdf5, H5F_ACC_RDONLY );
 	std::vector<Point3D> matrice_lue= get_donnees_3D(fichier);
+	// pour tests
+	matrice_lue.resize(10000); 
 	// export des donnees en Json
+	QJsonObject json;
+	QJsonArray coordonees;
+	QJsonArray valeurs;
+	std::vector<Point3D>::iterator it;
+	for(it=matrice_lue.begin();it!= matrice_lue.end();++it)
+	{
+		coordonees.push_back(it->px);
+		coordonees.push_back(it->py);
+		coordonees.push_back(it->pz);
+		valeurs.push_back(it->value);
+		valeurs.push_back(it->value);
+		valeurs.push_back(it->value);
+	}
+	std::cout<<"taille de coordonees: "<< coordonees.size()<< std::endl;
+	std::cout<<"taille de valeurs: "<< valeurs.size()<< std::endl;
 	
+	json["coordonees"]=coordonees;
+	json["valeurs"]=valeurs;
+	
+	// Sauvegarde dans un fichier
+	QFile saveFile(QStringLiteral("save_indented.json"));
+
+	if (!saveFile.open(QIODevice::WriteOnly))
+	{
+		qWarning("Couldn't open save file.");
+		return;
+	}
+	
+	QJsonDocument docJson(json);
+	saveFile.write(docJson.toJson(QJsonDocument::Indented));
 	
 }
-
-
-
-
-
-
-
 
 
 void  FenetrePrincipale::afficher_infos()
