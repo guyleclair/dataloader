@@ -9,7 +9,7 @@ FenetrePrincipale::FenetrePrincipale()
 	/** Creation des menus, barre d'outils */
 	creerMenus();
 	creerBarresOutils();
-    creerActions();
+	creerActions();
 
 	/** Connections */
 	connect(actionQuitter, SIGNAL(triggered()), qApp, SLOT(quit()));
